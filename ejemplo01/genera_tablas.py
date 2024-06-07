@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import Column, Integer, String, ForeignKey
+import datetime
 
 # se importa información del archivo configuracion
 from configuracion import cadena_base_datos
@@ -35,7 +36,33 @@ class Club(Base):
                           self.nombre, 
                           self.deporte, 
                           self.fundacion)
+    
+    def obtener_anios_vida(self):
+        return datetime.datetime.now().year - self.fundacion
+    
+    def obtener_dorsales_jugadores(self):
+        cadena = ""
+        lista = []
+        for i in self.jugadores:
+            lista.append(i.dorsal)
+            cadena = "%s%d\n" % (cadena, i.dorsal)
+        return cadena
+    
+    def obtener_suma_dorsales(self):
 
+        # se crea una variable para sumar y se itera en los jugadores del club, para ir sumando los dorsales con la variable suma
+
+        # suma = 0
+        # for i in self.jugadores:
+        #     suma = suma + i.dorsal
+        # return suma
+
+        # uso de una lista compresa, s.dorsal es lo que va a sacar, e itera en self.jugadores
+        # el resultado es una lista de los dorsales (numero), se aplica sum para sumar toda la lista
+        
+        suma = sum([s.dorsal for s in self.jugadores])
+        return suma
+    
 class Jugador(Base):
     __tablename__ = 'jugador'
     id = Column(Integer, primary_key=True)
@@ -52,6 +79,10 @@ class Jugador(Base):
     def __repr__(self):
         return "Jugador: %s - dorsal:%d - posición: %s" % (
                 self.nombre, self.dorsal, self.posicion)
+        
+    def obtener_dorsal_jugador(self):
+        return self.dorsal
+
 
 Base.metadata.create_all(engine)
 
